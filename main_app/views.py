@@ -5,6 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import RunSerializer, GeolocationSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer
+from .models import Profile, Like, Comment, Geolocation, Run
 
 # Define the home view
 class Home(APIView):
@@ -12,6 +13,15 @@ class Home(APIView):
     content = {'message': 'Welcome to the api home route!'}
     return Response(content)
 
+class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+  queryset = Profile.objects.all()
+  serializer_class = ProfileSerializer
+  # permission_classes = [permissions.IsAuthenticated]
+  lookup_field = 'id'
+
+  def get_queryset(self):
+    profile_id = self.kwargs['profile_id']
+    return Profile.objects.filter(profile_id=profile_id)
 
 class CreateUserView(generics.CreateAPIView):
   queryset = User.objects.all()
