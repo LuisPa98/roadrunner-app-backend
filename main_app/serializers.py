@@ -21,26 +21,39 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class RunSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Run
         fields = '__all__'
+        read_only_fields = ('Profile')
 
 class GeolocationSerializer(serializers.ModelSerializer):
+    
+
     class Meta:
         model = Geolocation
         fields = '__all__'
 
 class LikesSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Likes
         fields = '__all__'
+        read_only_fields = ('Profile', 'Run')
 
 class CommentsSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Comments
         field = '__all__'
+        read_only_fields = ('Profile', 'Run')
 
 class ProfileSerializer(serializers.ModelSerializer):
+
+
     class Meta:
         model = Profile
         fields = '_all__'
