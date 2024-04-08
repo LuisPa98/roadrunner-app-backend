@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Run, Geolocation, Likes, Comments, Profile
+from .models import Run, Geolocation, Like, Comment, Profile
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,14 +22,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RunSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = Run
         fields = '__all__'
         read_only_fields = ('Profile')
 
-class GeolocationSerializer(serializers.ModelSerializer):
-    
+class GeolocationSerializer(serializers.ModelSerializer):    
 
     class Meta:
         model = Geolocation
@@ -37,22 +35,20 @@ class GeolocationSerializer(serializers.ModelSerializer):
 
 class LikesSerializer(serializers.ModelSerializer):
 
-
     class Meta:
-        model = Likes
+        model = Like
         fields = '__all__'
         read_only_fields = ('Profile', 'Run')
 
 class CommentsSerializer(serializers.ModelSerializer):
 
-
     class Meta:
-        model = Comments
+        model = Comment
         field = '__all__'
         read_only_fields = ('Profile', 'Run')
 
 class ProfileSerializer(serializers.ModelSerializer):
-
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Profile
