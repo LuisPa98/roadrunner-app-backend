@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import RunSerializer, GeolocationSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer
 from .models import Profile, Like, Comment, Geolocation, Run
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 # Define the home view
 class Home(APIView):
@@ -28,13 +30,23 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer = self.get_serializer(instance)
 
     return Response(serializer.data)
-
-  def perform_update(self, serializer):
-    profile = self.get_object()
-    serializer.save()
-
+  # needs to be in patch method
+@receiver(post_save, sender=Profile)
+def perform_update(sender, instance, created, **kwargs):
+  # Only update if the profile already existed
+  if not created:  
+        # instance of the model being saved
+        user = instance.user
+        profile_username = instance.username  
+        if user.username != profile_username:
+            user.username = profile_username
+            user.save()
+      
+  # will delete user and profile when delete
   def perform_destroy(self, instance):
+    user = instance.user
     instance.delete()
+    user.delete()
 
 class CreateUserView(generics.CreateAPIView):
   queryset = User.objects.all()
