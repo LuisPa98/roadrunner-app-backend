@@ -23,6 +23,8 @@ class Profile(models.Model):
 class Follow(models.Model):
     follower = models.ForeignKey(Profile, related_name='following_set', on_delete=models.CASCADE)
     following = models.ForeignKey(Profile, related_name='follower_set', on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('follower', 'following')
 
 class Run(models.Model):
     distance = models.IntegerField()
@@ -30,7 +32,7 @@ class Run(models.Model):
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
     timetotal = models.IntegerField()
-    path = models.JSONField(default=list)
+    path = models.CharField()
     profile = models.ForeignKey(Profile, related_name='runs', on_delete=models.CASCADE)
     likes = models.ManyToManyField(Profile, related_name='liked_runs', through='Like')
     comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment')
