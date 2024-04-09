@@ -26,12 +26,14 @@ class Follow(models.Model):
 
 class Run(models.Model):
     distance = models.IntegerField()
+    date = models.DateField(default=date.today)
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
     timetotal = models.IntegerField()
     path = models.JSONField(default=list)
     profile = models.ForeignKey(Profile, related_name='runs', on_delete=models.CASCADE)
     likes = models.ManyToManyField(Profile, related_name='liked_runs', through='Like')
+    comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment')
 
     def __str__(self):
         return f'Distance: {distance}, Time Total: {timetotal}'
