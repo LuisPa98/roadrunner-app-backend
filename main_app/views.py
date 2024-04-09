@@ -4,8 +4,8 @@ from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers import RunSerializer, GeolocationSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, RunSerializer
-from .models import Profile, Like, Comment, Geolocation, Run
+from .serializers import RunSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, RunSerializer
+from .models import Profile, Like, Comment, Run
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
