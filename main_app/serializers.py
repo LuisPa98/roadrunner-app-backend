@@ -21,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class RunSerializer(serializers.ModelSerializer):
+    profile = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Run
