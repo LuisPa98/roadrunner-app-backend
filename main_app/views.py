@@ -93,7 +93,7 @@ class VerifyUserView(APIView):
 
 
 
-
+#Creates an instance of a run
 class CreateRun(generics.CreateAPIView):
   serializer_class = RunSerializer
 
@@ -103,7 +103,7 @@ class CreateRun(generics.CreateAPIView):
     profile = user.profile  # Accessing the Profile directly via the User instance
     serializer.save(profile=profile)
 
-
+#Gets all runs from the user
 class UserRuns(generics.ListAPIView):
   serializer_class = RunSerializer
   lookup_field = 'id'
@@ -113,7 +113,7 @@ class UserRuns(generics.ListAPIView):
     return Run.objects.filter(user = user).order_by('-date')
 
 
-
+#Will get all the runs from all the users of the app
 class FeedRun(generics.ListAPIView):
   serializer_class = RunSerializer
   permission_classes = [permissions.IsAuthenticated]
@@ -122,7 +122,7 @@ class FeedRun(generics.ListAPIView):
     return Run.objects.all().order_by('-date')
 
 
-
+#Will get all the runs from all the followers you follow.
 class FollowerRunFeed(generics.ListAPIView):
   serializer_class = RunSerializer
   permission_classes = [permissions.IsAuthenticated]
