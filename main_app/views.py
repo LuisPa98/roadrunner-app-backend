@@ -31,6 +31,13 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
     return Response(serializer.data)
   # needs to be in patch method
+  
+  # will delete user and profile when delete
+  def perform_destroy(self, instance):
+    user = instance.user
+    instance.delete()
+    user.delete()
+
 @receiver(post_save, sender=Profile)
 def perform_update(sender, instance, created, **kwargs):
   # Only update if the profile already existed
@@ -42,12 +49,6 @@ def perform_update(sender, instance, created, **kwargs):
             user.username = profile_username
             user.save()
       
-  # will delete user and profile when delete
-  def perform_destroy(self, instance):
-    user = instance.user
-    instance.delete()
-    user.delete()
-
 class CreateUserView(generics.CreateAPIView):
   queryset = User.objects.all()
   serializer_class = UserSerializer
