@@ -4,7 +4,7 @@ from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers import RunSerializer, GeolocationSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer
+from .serializers import RunSerializer, GeolocationSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, RunSerializer
 from .models import Profile, Like, Comment, Geolocation, Run
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -90,3 +90,52 @@ class VerifyUserView(APIView):
       'access': str(refresh.access_token),
       'user': UserSerializer(user).data
     })
+
+
+
+
+class CreateRun(generics.CreateAPIView):
+  serializer_class = RunSerializer
+
+  def perform_create(self, serializer):
+    # Directly access the Profile through the User model's related object
+    user = User.objects.get(id=user_id)
+    profile = user.profile  # Accessing the Profile directly via the User instance
+    serializer.save(profile=profile)
+
+
+class UserRuns(generics.ListAPIView):
+  serializer_class = RunSerializer
+  lookup_field = 'id'
+
+  def get_queryset(self):
+    user = self.request.user
+    return Run.objects.filter(user = user).order_by('-date')
+
+
+
+class FeedRun(generics.ListAPIView):
+  serializer_class = RunSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    return Run.objects.all().order_by('-date')
+
+
+
+class FollowerRunFeed(generics.ListAPIView):
+  serializer_class = RunSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    #Gets User
+    user = self.request.user.profile
+
+    # Get the profiles the user is following
+    followers_id = Profile.objects.filter(following_set__follower=user_profile).values_list('id')
+
+    # Fetch runs from these followed profiles
+    runs = Run.objects.filter(profile_id__in=followed_profiles_ids).order_by('-date')
+
+    return runs
+
