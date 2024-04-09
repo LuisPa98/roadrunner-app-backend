@@ -12,9 +12,10 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.username
-
+    # reciever decorater creates profile when registering user(sender=User) reference to User
     @receiver(post_save, sender=User)
     def update_profile_signal(sender,instance, created, **kwargs):
+        # creates and saves profile
         if created:
             Profile.objects.create(user=instance, username=instance.username, picture="")
         instance.profile.save()
