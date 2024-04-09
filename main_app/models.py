@@ -1,14 +1,23 @@
 from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     picture = models.ImageField(upload_to='uploads/')
     username = models.CharField(max_length=20)
 
     def __str__(self):
         return self.username
+
+    @receiver(post_save, sender=User)
+    def update_profile_signal(sender,instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance, username=instance.username, picture="")
+        instance.profile.save()
 
 class Follow(models.Model):
     follower = models.ForeignKey(Profile, related_name='following_set', on_delete=models.CASCADE)

@@ -14,14 +14,27 @@ class Home(APIView):
     return Response(content)
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
-  queryset = Profile.objects.all()
   serializer_class = ProfileSerializer
-  # permission_classes = [permissions.IsAuthenticated]
-  lookup_field = 'id'
+  # checks if person is Authenticated to view profile detail
+  permission_classes = [permissions.IsAuthenticated]
+  lookup_field = 'user_id'
 
   def get_queryset(self):
-    profile_id = self.kwargs['profile_id']
-    return Profile.objects.filter(profile_id=profile_id)
+    user = self.request.user
+    return Profile.objects.filter(user=user)
+
+  def retrieve(self, request, *args, **kwargs):
+    instance = self.get_object()
+    serializer = self.get_serializer(instance)
+
+    return Response(serializer.data)
+
+  def perform_update(self, serializer):
+    profile = self.get_object()
+    serializer.save()
+
+  def perform_destroy(self, instance):
+    instance.delete()
 
 class CreateUserView(generics.CreateAPIView):
   queryset = User.objects.all()
