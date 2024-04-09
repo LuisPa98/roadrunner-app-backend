@@ -52,4 +52,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = '_all__'
+        fields = '__all__'
