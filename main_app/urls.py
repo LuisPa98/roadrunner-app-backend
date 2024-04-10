@@ -16,8 +16,8 @@ urlpatterns = [
     path('runs/feed/', FeedRun.as_view(),name="feed-run"),
     path('runs/feed/followed/', FollowerRunFeed.as_view(), name='followed-run-feed'),
     path('runs/:id/', UserRuns.as_view(), name='user-runs'),
-
-    path('profile/<int:user_id>/run/', CreateRun.as_view(), name="create-run"),
+    path('runs/<int:profile_id>/create/', CreateRun.as_view(), name="create-run"),
+    
     #Comments 
     path('runs/:id/comment', CommentListCreate.as_view(), name="list-create-comment"),
     #Like Path?
