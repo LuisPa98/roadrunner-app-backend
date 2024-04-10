@@ -193,3 +193,31 @@ class CommentListCreate(generics.ListCreateAPIView):
     run_id = self.kwargs['run_id']
     run = Run.objects.get(id=cat_id)
     serializer.save(run=run)
+
+############   LIKE VIEWS      ###########
+
+class LikeRun(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  # add like 
+  def post(self,request,run_id):
+    profile = request.user.profile
+    run, created = Run.objects.get(id=run_id)
+
+    #Check if user already liked run by going through Like Model
+    if not Like.objects.filter(profile=profile, run=run).exists():
+      Like.objects.create(profile=profile, run=run)
+      return Response({'status': 'Like Added'}, status=status.HTTP_201_CREATED)
+    else:
+      return Response({'status': 'User Already Liked'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+  # remove like
+  def delete(self,request,run_id):
+    profile = request.user.profile
+    run = Run.objects.get(id=run_id)
+    like = Like.objects.filter(profile=profile, run=run)
+
+    if like.exists():
+      like.delete()
+      return Response({'status': 'Like Removed'}, status=status.HTTP_204_NO_CONTENT)
