@@ -96,10 +96,13 @@ class VerifyUserView(APIView):
     })
 
 
+############        RUN VIEWS       ###############
 
 #Creates an instance of a run
 class CreateRun(generics.CreateAPIView):
   serializer_class = RunSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
 
   def perform_create(self, serializer):
       profile_id = self.kwargs['profile_id']
@@ -126,6 +129,8 @@ class FeedRun(generics.ListAPIView):
   def get_queryset(self):
     return Run.objects.all().order_by('-date')
 
+
+################       FOLOWERS VIEWS      #######################
 
 #Will get all the runs from all the followers you follow.
 class FollowerRunFeed(generics.ListAPIView):
@@ -177,6 +182,10 @@ class FollowingList(generics.ListAPIView):
     profile = self.request.user.profile
     return profile.following.all()
 
+
+
+##########        COMMENT VIEWS         ###########
+
 class CommentListCreate(generics.ListCreateAPIView):
   serializer_class = CommentsSerializer
   permission_classes = [permissions.IsAuthenticated]
@@ -187,8 +196,11 @@ class CommentListCreate(generics.ListCreateAPIView):
 
   def perform_create(self, serializer):
     run_id = self.kwargs['run_id']
-    run = Run.objects.get(id=cat_id)
+    run = Run.objects.get(id=run_id)
     serializer.save(run=run)
+
+
+
 
 ############   LIKE VIEWS      ###########
 
@@ -198,7 +210,7 @@ class LikeRun(APIView):
   # add like 
   def post(self,request,run_id):
     profile = request.user.profile
-    run, created = Run.objects.get(id=run_id)
+    run = Run.objects.get(id=run_id)
 
     #Check if user already liked run by going through Like Model
     if not Like.objects.filter(profile=profile, run=run).exists():

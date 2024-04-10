@@ -8,7 +8,7 @@ urlpatterns = [
     path('users/token/refresh/', VerifyUserView.as_view(), name='token_refresh'),
     path('profile/<int:user_id>/', ProfileDetail.as_view(), name='profile-detail'),
 
-    #Follower & Following paths
+    #Follower & Following Paths
     path('profile/<int:user_id>/followers/', FollowerList.as_view(), name='follower-list'),
     path('profile/<int:user_id>/following/', FollowingList.as_view(), name='following-list'),
 
@@ -18,8 +18,9 @@ urlpatterns = [
     path('runs/<int:profile_id>/', UserRuns.as_view(), name='user-runs'),
     path('runs/<int:profile_id>/create/', CreateRun.as_view(), name="create-run"),
     
-    #Comments 
-    path('runs/:id/comment', CommentListCreate.as_view(), name="list-create-comment"),
-    #Like Path?
+    #Comments Path:
+    path('runs/<int:run_id>/comment/', CommentListCreate.as_view(), name="list-create-comment"),
+
+    #Like Paths:
     path('runs/<int:run_id>/like/', LikeRun.as_view(), name='like-run'),
 ]
