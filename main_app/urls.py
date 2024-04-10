@@ -6,7 +6,7 @@ urlpatterns = [
     path('users/register/', CreateUserView.as_view(), name='register'),
     path('users/login/', LoginView.as_view(), name='login'),
     path('users/token/refresh/', VerifyUserView.as_view(), name='token_refresh'),
-    path('profile/<int:user_id>/', ProfileDetail.as_view(), name='profile-detail'),
+    path('profile/<int:user_id>/', ProfileDetail.as_view(), name='profile-detail'), ### TEST THIS
 
     #Follower & Following paths
     path('profile/<int:profile_id>/follow-list/', FollowListView.as_view(), name='follow-list'),
@@ -15,7 +15,7 @@ urlpatterns = [
 
     #Run Paths:
     path('runs/feed/', FeedRun.as_view(),name="feed-run"),
-    path('runs/feed/followed/', FollowerRunFeed.as_view(), name='followed-run-feed'),
+    path('runs/feed/followed/', FollowerRunFeed.as_view(), name='followed-run-feed'),  ###TEST THIS
     path('runs/<int:profile_id>/', UserRuns.as_view(), name='user-runs'),
     path('runs/<int:profile_id>/create/', CreateRun.as_view(), name="create-run"),
     
