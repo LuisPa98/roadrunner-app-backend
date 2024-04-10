@@ -8,6 +8,8 @@ from .serializers import RunSerializer, CommentsSerializer, LikesSerializer, Use
 from .models import Profile, Like, Comment, Run, Follow
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 # Define the home view
 class Home(APIView):
@@ -151,36 +153,64 @@ class FollowerRunFeed(generics.ListAPIView):
 
 #Followers Views
 
-class FollowDetail(generics.RetrieveUpdateDestroyAPIView):
-  serializer_class = FollowSerializer
+class CreateFollow(generics.CreateAPIView):
+    serializer_class = FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-  def follow_user(request):
-    follower_profile_id = request.POST.get('follower_profile_id')
-    following_profile_id = request.POST.get('following_profile_id')
-    Follow.objects.create(follower=follower_profile_id, following=following_profile_id)
-    return Response({'success': 'User followed successfully'})
-  
-  def unfollow_user(request):
-    follower_profile_id = request.POST.get('follower_profile_id')
-    following_profile_id = request.POST.get('following_profile_id')
-    Follow.objects.delete()
-    return Response({'success': 'User unfollowed successfully'})
+    def post(self, request, follower_profile_id, following_profile_id):
+        # Ensure the follower and following profiles are different
+        if follower_profile_id == following_profile_id:
+            return Response({'error': 'Cannot follow oneself'}, status=status.HTTP_400_BAD_REQUEST)
 
-class FollowerList(generics.ListAPIView):
-  serializer_class = ProfileSerializer
-  permission_classes = [permissions.IsAuthenticated]
+        try:
+            follower = Profile.objects.get(pk=follower_profile_id)
+            following = Profile.objects.get(pk=following_profile_id)
+        except Profile.DoesNotExist:
+            raise Http404
 
-  def get_queryset(self):
-      profile = self.request.user.profile
-      return profile.follower.all()
+        follow, created = Follow.objects.get_or_create(follower=follower, following=following)
+        if created:
+            return Response({'status': 'User followed successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'status': 'Already following'}, status=status.HTTP_409_CONFLICT)
 
-class FollowingList(generics.ListAPIView):
-  serializer_class = ProfileSerializer
-  permission_classes = [permissions.IsAuthenticated]
+class RemoveFollow(generics.DestroyAPIView):
+    serializer_class = FollowSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-  def get_queryset(self):
-    profile = self.request.user.profile
-    return profile.following.all()
+    def delete(self, request, follower_profile_id, following_profile_id):
+        follower = Profile.objects.get(pk=follower_profile_id)
+        following = Profile.objects.get(pk=following_profile_id)
+        follow = Follow.objects.filter(follower=follower, following=following)
+        if follow.exists():
+            follow.delete()
+            return Response({'status': 'User unfollowed successfully'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'status': 'Follow relationship not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class FollowListView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, profile_id):
+        profile = get_object_or_404(Profile, pk=profile_id)
+
+        # Get the Follow instances where the given profile is the 'following', to find who is following this profile
+        follower_profiles = Follow.objects.filter(following=profile).select_related('follower')
+        followers = [follow.follower for follow in follower_profiles]
+
+        # Get the Follow instances where the given profile is the 'follower', to find who this profile is following
+        followed_profiles = Follow.objects.filter(follower=profile).select_related('following')
+        following = [follow.following for follow in followed_profiles]
+
+        # Serialize the data
+        profile_serializer = ProfileSerializer(followers, many=True)
+        following_serializer = ProfileSerializer(following, many=True)
+
+        # Return the data in the desired format
+        return Response({
+            'followers': profile_serializer.data,
+            'following': following_serializer.data
+        })
 
 
 

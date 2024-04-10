@@ -11,9 +11,15 @@ class Profile(models.Model):
     username = models.CharField(max_length=20)
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-
+    
     def __str__(self):
         return self.username
+    
+    def count_followers(self):
+        return self.followers.count()
+
+    def count_followings(self):
+        return self.followings.count()
     # reciever decorater creates profile when registering user(sender=User) reference to User model
     @receiver(post_save, sender=User)
     def update_profile_signal(sender,instance, created, **kwargs):
@@ -23,8 +29,9 @@ class Profile(models.Model):
         instance.profile.save()
 
 class Follow(models.Model):
-    follower = models.ForeignKey(Profile, related_name='following_set', on_delete=models.CASCADE)
-    following = models.ForeignKey(Profile, related_name='follower_set', on_delete=models.CASCADE)
+    follower = models.ForeignKey(Profile, related_name='follower_set', on_delete=models.CASCADE)
+    following = models.ForeignKey(Profile, related_name='following_set', on_delete=models.CASCADE)
+
     class Meta:
         unique_together = ('follower', 'following')
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, CreateUserView, LoginView, VerifyUserView, ProfileDetail, FeedRun,FollowerRunFeed, CreateRun, UserRuns, CommentListCreate, FollowingList, FollowerList, LikeRun
+from .views import Home, CreateUserView, LoginView, VerifyUserView, ProfileDetail, FeedRun,FollowerRunFeed, CreateRun, UserRuns, CommentListCreate, LikeRun, CreateFollow, RemoveFollow, FollowListView
 
 urlpatterns = [
     path('', Home.as_view(), name='home'),
@@ -8,9 +8,10 @@ urlpatterns = [
     path('users/token/refresh/', VerifyUserView.as_view(), name='token_refresh'),
     path('profile/<int:user_id>/', ProfileDetail.as_view(), name='profile-detail'),
 
-    #Follower & Following Paths
-    path('profile/<int:user_id>/followers/', FollowerList.as_view(), name='follower-list'),
-    path('profile/<int:user_id>/following/', FollowingList.as_view(), name='following-list'),
+    #Follower & Following paths
+    path('profile/<int:profile_id>/follow-list/', FollowListView.as_view(), name='follow-list'),
+    path('profile/<int:follower_profile_id>/follow/<int:following_profile_id>/', CreateFollow.as_view(), name='create-follow'),
+    path('profile/<int:follower_profile_id>/unfollow/<int:following_profile_id>/', RemoveFollow.as_view(), name='remove-follow'),
 
     #Run Paths:
     path('runs/feed/', FeedRun.as_view(),name="feed-run"),
