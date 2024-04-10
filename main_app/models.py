@@ -29,7 +29,7 @@ class Follow(models.Model):
         unique_together = ('follower', 'following')
 
 class Run(models.Model):
-    distance = models.IntegerField()
+    distance = models.FloatField()
     date = models.DateField(default=date.today)
     timetotal = models.IntegerField()
     path = models.CharField()
