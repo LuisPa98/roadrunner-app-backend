@@ -48,3 +48,10 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+
+class FollowSerializer(serializers.ModelSerializer):
+    follower_id = serializers.PrimaryKeyRelatedField(source='follower.user', read_only=True)
+    following_id = serializers.PrimaryKeyRelatedField(source='following.user', read_only=True)
+    class Meta:
+        model = Follow
+        fields = '__all__'

@@ -144,3 +144,17 @@ class FollowerRunFeed(generics.ListAPIView):
 
     return runs
 
+#Followers Views
+
+class FollowDetail(generics)
+  serializerLizer_class = FollowSerializer,
+  def follow_user(request):
+    follower_profile_id = request.POST.get('follower_profile_id')
+    following_profile_id = request.POST.get('following_profile_id')
+    Follow.objects.create(follower=follower_profile_id, following=following_profile_id)
+    return Response({'success': 'User followed successfully'})
+  def unfollow_user(request):
+    follower_profile_id = request.POST.get('follower_profile_id')
+    following_profile_id = request.POST.get('following_profile_id')
+    follow_instance.delete()
+    return Response({'success': 'User unfollowed successfully'})
