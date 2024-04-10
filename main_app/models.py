@@ -44,6 +44,9 @@ class Run(models.Model):
     def count_likes(self):
         return self.likes.count()
 
+    def count_comment(self):
+        return self.comments.count()
+
 
 class Like(models.Model):
     run = models.ForeignKey(Run, on_delete=models.CASCADE)
@@ -52,7 +55,7 @@ class Like(models.Model):
 class Comment(models.Model):
     run = models.ForeignKey(Run, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=50)
+    comment = models.CharField(max_length=5000)
 
     def __str__(self):
         return f'{self.profile.username} commented on {self.run}'

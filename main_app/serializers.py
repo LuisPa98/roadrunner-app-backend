@@ -39,8 +39,8 @@ class LikesSerializer(serializers.ModelSerializer):
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        field = '__all__'
-        read_only_fields = ('Profile', 'Run')
+        fields = '__all__' 
+        read_only_fields = ('Profile', 'Run')  
 
 class FollowSerializer(serializers.ModelSerializer):
     follower_id = serializers.PrimaryKeyRelatedField(source='follower.user', read_only=True)
