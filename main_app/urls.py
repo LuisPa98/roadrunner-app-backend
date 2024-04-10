@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, CreateUserView, LoginView, VerifyUserView, ProfileDetail, FeedRun,FollowerRunFeed, CreateRun, UserRuns, CommentListCreate, FollowingList, FollowerList
+from .views import Home, CreateUserView, LoginView, VerifyUserView, ProfileDetail, FeedRun,FollowerRunFeed, CreateRun, UserRuns, CommentListCreate, FollowingList, FollowerList, LikeRun
 
 urlpatterns = [
     path('', Home.as_view(), name='home'),
@@ -19,5 +19,7 @@ urlpatterns = [
 
     path('profile/<int:user_id>/run/', CreateRun.as_view(), name="create-run"),
     #Comments 
-    path('runs/:id/comment', CommentListCreate.as_view(), name="list-create-comment")
+    path('runs/:id/comment', CommentListCreate.as_view(), name="list-create-comment"),
+    #Like Path?
+    path('runs/<int:run_id>/like/', LikeRun.as_view(), name='like-run'),
 ]
