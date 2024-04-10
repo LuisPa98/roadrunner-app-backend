@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import RunSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, FollowSerializer
-from .models import Profile, Like, Comment, Run
+from .models import Profile, Like, Comment, Run, Follow
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
@@ -157,7 +157,7 @@ class FollowDetail(generics.RetrieveUpdateDestroyAPIView):
   def unfollow_user(request):
     follower_profile_id = request.POST.get('follower_profile_id')
     following_profile_id = request.POST.get('following_profile_id')
-    follow_instance.delete()
+    Follow.objects.delete()
     return Response({'success': 'User unfollowed successfully'})
 
 class FollowerList(generics.ListAPIView):
@@ -173,7 +173,7 @@ class FollowingList(generics.ListAPIView):
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
-    profile = self,request.user.profile
+    profile = self.request.user.profile
     return profile.following.all()
 
 class CommentListCreate(generics.ListCreateAPIView):

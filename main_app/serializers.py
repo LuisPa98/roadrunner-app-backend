@@ -43,8 +43,8 @@ class CommentsSerializer(serializers.ModelSerializer):
         read_only_fields = ('Profile', 'Run')
 
 class FollowSerializer(serializers.ModelSerializer):
-    # follower_id = serializers.PrimaryKeyRelatedField(source='follower.user', read_only=True)
-    # following_id = serializers.PrimaryKeyRelatedField(source='following.user', read_only=True)
+    follower_id = serializers.PrimaryKeyRelatedField(source='follower.user', read_only=True)
+    following_id = serializers.PrimaryKeyRelatedField(source='following.user', read_only=True)
     class Meta:
         model = Follow
         fields = ('id', 'follower', 'following')
