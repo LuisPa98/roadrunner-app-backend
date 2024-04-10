@@ -101,16 +101,11 @@ class VerifyUserView(APIView):
 class CreateRun(generics.CreateAPIView):
   serializer_class = RunSerializer
 
-  def get_queryset(self):
-    user_id = self.kwargs['user_id']
-    return Profile.objects.filter(user_id=user_id)
-
   def perform_create(self, serializer):
-    # Directly access the Profile through the User model's related object
-    user_id = self.kwargs['user_id']
-    user = User.objects.get(id=user_id)
-    profile = user.profile  # Accessing the Profile directly via the User instance
-    serializer.save(profile=profile)
+      profile_id = self.kwargs['profile_id']
+      profile = Profile.objects.get(pk=profile_id)  # Get the profile instance using profile_id
+      serializer.save(profile=profile)
+
 
 #Gets all runs from the user
 class UserRuns(generics.ListAPIView):
