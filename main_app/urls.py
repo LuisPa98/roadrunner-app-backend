@@ -9,8 +9,8 @@ urlpatterns = [
     path('profile/<int:user_id>/', ProfileDetail.as_view(), name='profile-detail'),
 
     #Follower & Following paths
-    path('followers/', FollowerList.as_view(), name='follower-list'),
-    path('following/', FollowingList.as_view(), name='following-list'),
+    path('profile/<int:user_id>/followers/', FollowerList.as_view(), name='follower-list'),
+    path('profile/<int:user_id>/following/', FollowingList.as_view(), name='following-list'),
 
     #Run Paths:
     path('runs/feed/', FeedRun.as_view(),name="feed-run"),
