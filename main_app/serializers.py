@@ -27,7 +27,7 @@ class RunSerializer(serializers.ModelSerializer):
     class Meta:
         model = Run
         fields = '__all__'
-        read_only_fields = ('Profile')
+        read_only_fields = ('likes', 'comments')  
 
 class LikesSerializer(serializers.ModelSerializer):
 

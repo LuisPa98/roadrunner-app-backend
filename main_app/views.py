@@ -103,18 +103,19 @@ class CreateRun(generics.CreateAPIView):
 
   def perform_create(self, serializer):
       profile_id = self.kwargs['profile_id']
-      profile = Profile.objects.get(pk=profile_id)  # Get the profile instance using profile_id
+      profile = Profile.objects.get(pk=profile_id)
+      print(profile_id)
+      print(profile)  # Get the profile instance using profile_id
       serializer.save(profile=profile)
-
 
 #Gets all runs from the user
 class UserRuns(generics.ListAPIView):
   serializer_class = RunSerializer
-  lookup_field = 'id'
+  lookup_field = 'profile_id'
 
   def get_queryset(self):
-    user = self.request.user
-    return Run.objects.filter(user = user).order_by('-date')
+    profile = self.kwargs['profile_id']
+    return Run.objects.filter(profile = profile).order_by('-date')
 
 
 #Will get all the runs from all the users of the app

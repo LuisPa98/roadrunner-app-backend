@@ -15,7 +15,7 @@ urlpatterns = [
     #Run Paths:
     path('runs/feed/', FeedRun.as_view(),name="feed-run"),
     path('runs/feed/followed/', FollowerRunFeed.as_view(), name='followed-run-feed'),
-    path('runs/:id/', UserRuns.as_view(), name='user-runs'),
+    path('runs/<int:profile_id>/', UserRuns.as_view(), name='user-runs'),
     path('runs/<int:profile_id>/create/', CreateRun.as_view(), name="create-run"),
     
     #Comments 
