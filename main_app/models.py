@@ -9,15 +9,17 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     picture = models.ImageField(upload_to='uploads/')
     username = models.CharField(max_length=20)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.username
-    # reciever decorater creates profile when registering user(sender=User) reference to User
+    # reciever decorater creates profile when registering user(sender=User) reference to User model
     @receiver(post_save, sender=User)
     def update_profile_signal(sender,instance, created, **kwargs):
-        # creates and saves profile
+        # creates and saves profile created comes from post_save 
         if created:
-            Profile.objects.create(user=instance, username=instance.username, picture="")
+            Profile.objects.create(user=instance, username=instance.username, picture="", last_name=instance.last_name, first_name=instance.first_name)
         instance.profile.save()
 
 class Follow(models.Model):
@@ -38,7 +40,7 @@ class Run(models.Model):
     comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment')
 
     def __str__(self):
-        return f'Distance: {distance}, Time Total: {timetotal}'
+        return f'Distance: {self.distance}, Time Total: {self.timetotal}'
 
 class Like(models.Model):
     run = models.ForeignKey(Run, on_delete=models.CASCADE)

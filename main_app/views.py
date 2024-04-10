@@ -4,7 +4,7 @@ from rest_framework import generics, status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers import RunSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, RunSerializer
+from .serializers import RunSerializer, CommentsSerializer, LikesSerializer, UserSerializer, ProfileSerializer, FollowSerializer
 from .models import Profile, Like, Comment, Run
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -44,9 +44,13 @@ def perform_update(sender, instance, created, **kwargs):
   if not created:  
         # instance of the model being saved
         user = instance.user
+        profile_first_name = instance.first_name
+        profile_last_name = instance.last_name
         profile_username = instance.username  
         if user.username != profile_username:
             user.username = profile_username
+            user.first_name = profile_first_name
+            user.last_name = profile_last_name
             user.save()
       
 class CreateUserView(generics.CreateAPIView):
@@ -146,15 +150,46 @@ class FollowerRunFeed(generics.ListAPIView):
 
 #Followers Views
 
-class FollowDetail(generics)
-  serializerLizer_class = FollowSerializer,
+class FollowDetail(generics.RetrieveUpdateDestroyAPIView):
+  serializer_class = FollowSerializer
+
   def follow_user(request):
     follower_profile_id = request.POST.get('follower_profile_id')
     following_profile_id = request.POST.get('following_profile_id')
     Follow.objects.create(follower=follower_profile_id, following=following_profile_id)
     return Response({'success': 'User followed successfully'})
+  
   def unfollow_user(request):
     follower_profile_id = request.POST.get('follower_profile_id')
     following_profile_id = request.POST.get('following_profile_id')
     follow_instance.delete()
     return Response({'success': 'User unfollowed successfully'})
+
+class FollowerList(generics.ListAPIView):
+  serializer_class = ProfileSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+      profile = self.request.user.profile
+      return profile.follower.all()
+
+class FollowingList(generics.ListAPIView):
+  serializer_class = ProfileSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    profile = self,request.user.profile
+    return profile.following.all()
+
+class CommentListCreate(generics.ListCreateAPIView):
+  serializer_class = CommentsSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    run_id = self.kwargs['run_id']
+    return Comment.objects.filter(run_id=run_id)
+
+  def perform_create(self, serializer):
+    run_id = self.kwargs['run_id']
+    run = Run.objects.get(id=cat_id)
+    serializer.save(run=run)
