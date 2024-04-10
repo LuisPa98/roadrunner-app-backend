@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    picture = models.ImageField(upload_to='uploads/')
+    picture = models.ImageField(upload_to='uploads/', blank=True)
     username = models.CharField(max_length=20)
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -31,13 +31,11 @@ class Follow(models.Model):
 class Run(models.Model):
     distance = models.IntegerField()
     date = models.DateField(default=date.today)
-    starttime = models.DateTimeField()
-    endtime = models.DateTimeField()
     timetotal = models.IntegerField()
     path = models.CharField()
     profile = models.ForeignKey(Profile, related_name='runs', on_delete=models.CASCADE)
-    likes = models.ManyToManyField(Profile, related_name='liked_runs', through='Like')
-    comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment')
+    likes = models.ManyToManyField(Profile, related_name='liked_runs', through='Like', blank=True)
+    comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment', blank=True)
 
     def __str__(self):
         return f'Distance: {distance}, Time Total: {timetotal}'
