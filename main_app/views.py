@@ -22,33 +22,28 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
   # checks if person is Authenticated to view profile detail
   permission_classes = [permissions.IsAuthenticated]
   lookup_field = 'user_id'
-
   def get_queryset(self):
     user = self.request.user
     return Profile.objects.filter(user=user)
-
   def retrieve(self, request, *args, **kwargs):
     instance = self.get_object()
     serializer = self.get_serializer(instance)
-
     return Response(serializer.data)
   # needs to be in patch method
-  
   # will delete user and profile when delete
   def perform_destroy(self, instance):
     user = instance.user
     instance.delete()
     user.delete()
-
 @receiver(post_save, sender=Profile)
 def perform_update(sender, instance, created, **kwargs):
   # Only update if the profile already existed
-  if not created:  
+  if not created:
         # instance of the model being saved
         user = instance.user
         profile_first_name = instance.first_name
         profile_last_name = instance.last_name
-        profile_username = instance.username  
+        profile_username = instance.username
         if user.username != profile_username:
             user.username = profile_username
             user.first_name = profile_first_name
@@ -135,19 +130,21 @@ class FeedRun(generics.ListAPIView):
 ################       FOLOWERS VIEWS      #######################
 
 #Will get all the runs from all the followers you follow.
-class FollowerRunFeed(generics.ListAPIView):
+class FollowingRunFeed(generics.ListAPIView):
   serializer_class = RunSerializer
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
-    #Gets User
-    user = self.request.user.profile
+    # Get the Profile instance for the logged-in user
+    user_profile = self.request.user.profile
 
-    # Get the profiles the user is following
-    followers_id = Profile.objects.filter(following_set__follower=user_profile).values_list('id')
+    # Get the profile instances that the user is following
+    followed_profiles_ids = Follow.objects.filter(
+        follower=user_profile
+    ).values_list('following__user', flat=True)  # Assuming 'following' relates to 'Profile'
 
     # Fetch runs from these followed profiles
-    runs = Run.objects.filter(profile_id__in=followed_profiles_ids).order_by('-date')
+    runs = Run.objects.filter(profile__user__in=followed_profiles_ids).order_by('-date')
 
     return runs
 
@@ -245,7 +242,11 @@ class LikeRun(APIView):
     #Check if user already liked run by going through Like Model
     if not Like.objects.filter(profile=profile, run=run).exists():
       Like.objects.create(profile=profile, run=run)
-      return Response({'status': 'Like Added'}, status=status.HTTP_201_CREATED)
+      return Response({
+                'status': 'Like Added',
+                'profile_id': profile.id,
+                'username': profile.user.username
+            }, status=status.HTTP_201_CREATED)
     else:
       return Response({'status': 'User Already Liked'}, status=status.HTTP_400_BAD_REQUEST)
 
