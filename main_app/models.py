@@ -45,7 +45,7 @@ class Run(models.Model):
     comments = models.ManyToManyField(Profile, related_name='comment_runs', through='Comment', blank=True)
 
     def __str__(self):
-        return f'Distance: {distance}, Time Total: {timetotal}'
+        return f'Distance: {self.distance}, Time Total: {self.timetotal}'
     
     # Returns the count of likes for this run instance
     def count_likes(self):
