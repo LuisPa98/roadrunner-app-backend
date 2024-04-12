@@ -20,14 +20,22 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
+class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = Profile
+        fields = '__all__'
+        
+
 class RunSerializer(serializers.ModelSerializer):
-    profile = serializers.PrimaryKeyRelatedField(read_only=True)
+    # profile = serializers.PrimaryKeyRelatedField(read_only=True)
+    profile = ProfileSerializer(read_only=True)
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Run
         fields = '__all__'
-        read_only_fields = ('likes', 'comments')  
+        # read_only_fields = ('likes', 'comments')  
 
 
 class LikesSerializer(serializers.ModelSerializer):
@@ -49,8 +57,3 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = '__all__'
 
-class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    class Meta:
-        model = Profile
-        fields = '__all__'
