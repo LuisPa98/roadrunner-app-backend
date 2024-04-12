@@ -17,6 +17,13 @@ class Home(APIView):
     content = {'message': 'Welcome to the api home route!'}
     return Response(content)
 
+#Retrieves all
+class UsersListView(generics.ListAPIView):
+  serializer_class = UserSerializer
+  permission_classes = [permissions.IsAuthenticated]
+  queryset = User.objects.all()
+
+
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ProfileSerializer
   # checks if person is Authenticated to view profile detail
@@ -97,7 +104,7 @@ class VerifyUserView(APIView):
       'user': UserSerializer(user).data,
       'profile': ProfileSerializer(profile).data
     })
-
+  
 
 ############        RUN VIEWS       ###############
 
