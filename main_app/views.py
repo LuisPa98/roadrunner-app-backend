@@ -57,11 +57,13 @@ class CreateUserView(generics.CreateAPIView):
   def create(self, request, *args, **kwargs):
     response = super().create(request, *args, **kwargs)
     user = User.objects.get(username=response.data['username'])
+    profile = Profile.objects.get(user=user)
     refresh = RefreshToken.for_user(user)
     return Response({
       'refresh': str(refresh),
       'access': str(refresh.access_token),
-      'user': response.data
+      'user': response.data,
+      'profile': ProfileSerializer(profile).data
     })
 
 class LoginView(APIView):
@@ -72,11 +74,13 @@ class LoginView(APIView):
     password = request.data.get('password')
     user = authenticate(username=username, password=password)
     if user:
+      profile = Profile.objects.get(user=user)
       refresh = RefreshToken.for_user(user)
       return Response({
         'refresh': str(refresh),
         'access': str(refresh.access_token),
-        'user': UserSerializer(user).data
+        'user': UserSerializer(user).data,
+        'profile': ProfileSerializer(profile).data
       })
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -85,11 +89,13 @@ class VerifyUserView(APIView):
 
   def get(self, request):
     user = User.objects.get(username=request.user)  # Fetch user profile
+    profile = Profile.objects.get(user=user)
     refresh = RefreshToken.for_user(request.user)  # Generate new refresh token
     return Response({
       'refresh': str(refresh),
       'access': str(refresh.access_token),
-      'user': UserSerializer(user).data
+      'user': UserSerializer(user).data,
+      'profile': ProfileSerializer(profile).data
     })
 
 
