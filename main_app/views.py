@@ -17,25 +17,40 @@ class Home(APIView):
     content = {'message': 'Welcome to the api home route!'}
     return Response(content)
 
-#Retrieves all
+#Retrieves all Users
 class UsersListView(generics.ListAPIView):
-  serializer_class = UserSerializer
+  serializer_class = ProfileSerializer
   permission_classes = [permissions.IsAuthenticated]
-  queryset = User.objects.all()
+  queryset = Profile.objects.all()
 
+  def get_queryset(self):
+    # Retrieve the 'search' parameter from the URL query parameters, defaulting to None if not present.
+    query = self.request.query_params.get('search', None)
+    if query is not None: 
+      return Profile.objects.filter(user__username__icontains = query)  #Will filter through input of the query to get users assosiated with the query.
+    return Profile.objects.all() #Returns all users if no query was inputted
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ProfileSerializer
   # checks if person is Authenticated to view profile detail
   permission_classes = [permissions.IsAuthenticated]
   lookup_field = 'user_id'
+
+  # gets user from token
   def get_queryset(self):
     user = self.request.user
     return Profile.objects.filter(user=user)
+
+  # Get user_id from URL params
+  def get_queryset(self):
+    user_id = self.kwargs.get('user_id')
+    return Profile.objects.filter(user_id=user_id)
+
   def retrieve(self, request, *args, **kwargs):
     instance = self.get_object()
     serializer = self.get_serializer(instance)
     return Response(serializer.data)
+    
   # needs to be in patch method
   # will delete user and profile when delete
   def perform_destroy(self, instance):
