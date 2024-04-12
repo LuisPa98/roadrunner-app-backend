@@ -10,6 +10,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Define the home view
 class Home(APIView):
@@ -33,7 +34,7 @@ class UsersListView(generics.ListAPIView):
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ProfileSerializer
   # checks if person is Authenticated to view profile detail
-  permission_classes = [permissions.IsAuthenticated]
+  permission_classes = [IsAuthenticatedOrReadOnly,]
   lookup_field = 'user_id'
 
   # gets user from token
@@ -57,6 +58,8 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     user = instance.user
     instance.delete()
     user.delete()
+      # if user.delete():
+      #   return: Response({'error': 'Profile Deleted'}
 @receiver(post_save, sender=Profile)
 def perform_update(sender, instance, created, **kwargs):
   # Only update if the profile already existed
@@ -272,7 +275,7 @@ class LikeRun(APIView):
       Like.objects.create(profile=profile, run=run)
       return Response({
                 'status': 'Like Added',
-                'profile_id': profile.id,
+                'profile_id': profile.user.id,
                 'username': profile.user.username
             }, status=status.HTTP_201_CREATED)
     else:
