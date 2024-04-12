@@ -10,7 +10,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
 
 # Define the home view
 class Home(APIView):
@@ -34,7 +34,7 @@ class UsersListView(generics.ListAPIView):
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ProfileSerializer
   # checks if person is Authenticated to view profile detail
-  permission_classes = [IsAuthenticatedOrReadOnly,]
+  permission_classes = [permissions.IsAuthenticated]
   lookup_field = 'user_id'
 
   # gets user from token
