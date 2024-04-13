@@ -253,6 +253,7 @@ class CommentListCreate(generics.ListCreateAPIView):
     return Comment.objects.filter(run_id=run_id)
 
   def perform_create(self, serializer):
+    print("Received data for new comment:", self.request.data)  # Debug print
     run_id = self.kwargs['run_id']
     run = Run.objects.get(id=run_id)
     serializer.save(run=run)
