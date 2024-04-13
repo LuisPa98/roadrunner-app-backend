@@ -25,7 +25,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
-        
+
 
 class RunSerializer(serializers.ModelSerializer):
     # profile = serializers.PrimaryKeyRelatedField(read_only=True)
